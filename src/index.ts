@@ -88,7 +88,9 @@ export default {
 		if (deleteMatch && request.method === "DELETE") {
 			const id = Number(deleteMatch[1]);
 			try {
-				await env.DB.prepare("DELETE FROM activity_log WHERE id = ?").bind(id).run();
+				// rowid, like listEntries: the primary key is `id` in production and
+				// `activity_id` on Previews, but it aliases rowid in both.
+				await env.DB.prepare("DELETE FROM activity_log WHERE rowid = ?").bind(id).run();
 				return json({ entries: await listEntries(env.DB) });
 			} catch (error) {
 				console.error({
